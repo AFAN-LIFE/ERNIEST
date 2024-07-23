@@ -10,9 +10,11 @@ if 'login_success' not in st.session_state:
     st.session_state.login_success = False
 if not st.session_state.login_success:
     from view.login import login_view
-
-    with st.container(height=600):
-        login_view(st)
+    with login_area:
+        with st.container(height=600):
+            login_view(st)
+    if st.session_state.login_success:
+        login_area.empty()
 
 # 侧边栏和对话模块
 if st.session_state.login_success:

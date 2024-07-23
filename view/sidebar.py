@@ -1,7 +1,30 @@
+from config import default_token
+from streamlit_modal import Modal
 from view.tool import get_image_base64
 from config import default_robot_name, default_user_name
-from service.conversation import update_conversation_time, create_conversation, create_message, get_conversation_dict, \
-    get_message_via_cid
+from service.conversation import get_conversation_dict, get_message_via_cid
+
+
+def generate_token(API_KEY, Secret_Key):
+    import requests
+    import json
+    def main():
+        url = f"https://aip.baidubce.com/oauth/2.0/token?client_id={API_KEY}&client_secret={Secret_Key}&grant_type=client_credentials"
+        payload = json.dumps("")
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+        return response.json()
+
+    try:
+        response = main()
+        access_token = response.get("access_token")
+        return "success", access_token
+    except Exception as e:
+        return "error", e
+
 
 def sidebar_view(st_object):
     image_path = 'asset/erniest.png'
@@ -14,13 +37,45 @@ def sidebar_view(st_object):
     """
     st_object.sidebar.markdown(html_string, unsafe_allow_html=True)
     st_object.sidebar.title(f"你好{st_object.session_state.user_name}")
-    # st_object.sidebar.markdown('<div style="text-align:center"><a href="https://github.com/AFAN-LIFE/ERNIEST">项目介绍</a> &emsp;<a href="https://cloud.baidu.com/article/1089328">获取token</a></div>', unsafe_allow_html=True)
     if 'token' not in st_object.session_state:
         st_object.session_state.token = ''
-    token = st_object.sidebar.text_input("请输入你的token", type="password")
-    if token:
-        st_object.session_state.token = token
-    model = st_object.sidebar.selectbox('请选择模型', ('ernie-speed', 'ernie-4.0'))
+    t1, t2 = st_object.sidebar.columns([2, 1])
+    token_text = t1.text_input("", placeholder="请输入token", type="password", value=default_token)
+    print('token更换', token_text)
+    if token_text:
+        st_object.session_state.token = token_text
+    if 'generator_modal' not in st_object.session_state:
+        st_object.session_state.generator_modal = False
+    if 'generate_button' not in st_object.session_state:
+        st_object.session_state.generate_button = False
+    t2.text("")
+    t2.text("")
+    generator = t2.button("生成", key='generate_token_button')
+    if generator:
+        st_object.session_state.generator_modal = True
+    if st_object.session_state.generator_modal:
+        generator_modal = Modal(title="生成token", key="generate_modal", max_width=400)
+        with generator_modal.container():  # 弹出控件
+            API_KEY = st_object.text_input(label="请输入API KEY", placeholder="")
+            Secret_KEY = st_object.text_input(label="请输入Secret KEY", placeholder="")
+            g1, g2, g3 = st_object.columns([1, 1, 1])
+            generate_button = g1.button("生成token", key='start_generate', type='primary')
+            generate_detail = g2.link_button("帮助文档", 'https://cloud.baidu.com/article/1089328')
+            if API_KEY != "" and Secret_KEY != "" and generate_button:
+                token_status, token_data = generate_token(API_KEY, Secret_KEY)
+                if token_status == "success":
+                    st_object.markdown(
+                        f'<div style="color: green; font-weight: bold; text-align: center;">token产生成功，请复制：{token_data}</div>',
+                        unsafe_allow_html=True)
+                else:
+                    st_object.markdown(
+                        f'<div style="color: red; font-weight: bold; text-align: center;">token生成失败，原因是：{token_data}</div>',
+                        unsafe_allow_html=True)
+            if g3.button('点击返回', key='return_back'):
+                st_object.session_state.generator_modal = False
+                generator_modal.close()
+
+    model = st_object.sidebar.selectbox('请选择模型', ('ernie-speed-128k', 'ernie-3.5-8k'))
     if model:
         st_object.session_state.model = model
     if "conversation_id" not in st_object.session_state:
@@ -39,15 +94,16 @@ def sidebar_view(st_object):
                 generator.markdown(f"### {k}")
                 select_zip = zip([str(i['id']) for i in v], [str(i['theme']) for i in v])
                 for id, theme in select_zip:
-                    # 用会话的第一条消息作为主题概括，只展示前10个字符，不然会跨行
-                    if generator.button(theme[:10], use_container_width=True, key=id):
+                    # 用会话的第一条消息作为主题概括，只展示前15个字符，不然会跨行
+                    if generator.button(theme[:15], use_container_width=True, key=id):
                         st_object.session_state.conversation_id = id
                         messages = get_message_via_cid(st_object.session_state.conversation_id)
                         adj_messages = [
                             {'role': default_robot_name if i['sender'] == default_robot_name else default_user_name,
                              'content': i['message']} for i in messages]
+                        # 更新当前的消息列表
                         st_object.session_state.messages = adj_messages
-
+                        print('更新消息', st_object.session_state.messages)
 
     col1, col2 = st_object.sidebar.columns([2, 1])
     col1.markdown("### 历史会话记录")
@@ -65,4 +121,3 @@ def sidebar_view(st_object):
     else:
         with placeholder:
             show_history_conversations(st_object.session_state.user_name, st_object.sidebar)
-

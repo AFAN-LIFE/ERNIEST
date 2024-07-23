@@ -1,4 +1,5 @@
 # ERNIEST
+# 基于Streamlit和免费开源的
 
 **作者：AFAN（微信：afan-life）**   
 
@@ -15,4 +16,8 @@ Python的核心包版本：
 ```
 streamlit                    1.35.0
 erniebot                     0.5.8
+streamlit-modal              0.1.2
 ```
+
+## 二次开发说明
+
