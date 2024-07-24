@@ -17,7 +17,10 @@ def login_view(st_object):
         </div>
     """
     st_object.markdown(html_string, unsafe_allow_html=True)
-    st_object.markdown('<div style="text-align:center"><strong>基于百度ERNIE和Streamlit的可供快速二次开发的大模型交流平台</strong></div>', unsafe_allow_html=True)
+    st_object.markdown('<div style="text-align:center"><strong>基于百度ERNIE和STreamlit的大模型交流平台</strong></div>', unsafe_allow_html=True)
+    st_object.markdown(
+        '<div style="text-align:center"><strong>A large model communication platform based on Baidu ERNIE and STreamlit</strong></div>',
+        unsafe_allow_html=True)
     # 用户名和密码输入
     login_u1, login_u2, _ = st_object.columns([2, 2, 1])
     login_u1.markdown(
