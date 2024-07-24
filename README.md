@@ -1,9 +1,12 @@
 # ERNIEST
 
-基于百度ERNIE和Streamlit的可供快速二次开发的大模型交流平台
+基于百度ERNIE和Streamlit的可供快速二次开发的大模型交流平台  
 A large model communication platform based on Baidu ERNIE and Streamlit for rapid secondary development
 
-**作者：AFAN（微信：afan-life，邮箱：fcncassandra@gmail.com）**
+在线体验：https://erniest.streamlit.app/  
+Online experience：https://erniest.streamlit.app/ 
+
+**作者：AFAN（微信：afan-life，邮箱：fcncassandra@gmail.com）**  
 **Author: AFAN (WeChat: afan-life, Email: fcncassandra@gmail.com)**
 
 ## 功能设计 Functional Design
