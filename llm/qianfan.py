@@ -36,11 +36,9 @@ def get_qianfan_response(messages, st_object):
             new_messages.append({'role': default_robot_name, 'content': None, 'function_call': response['function_call']})
             new_messages.append({'role': 'function', 'name': function_call['name'],
                                  'content': json.dumps(func_result, ensure_ascii=False)})
-            print('new_messages', new_messages)
             # 将结果返回进行润色
             final_response = qianfan.ChatCompletion().do(model=st_object.session_state.model, messages=new_messages,
                                                          top_p=0.2, functions=functions, stream=False)
-            print('final_response', final_response)
             final_result = final_response['body']['result']
             return final_result
         else:

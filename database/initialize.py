@@ -1,6 +1,7 @@
 from database.connection import gpt_connection
 
 def initialize_database():
+    print('初始化数据库')
     tables_to_check = ['conversations', 'messages']
     # 创建游标对象
     cursor = gpt_connection.cursor()

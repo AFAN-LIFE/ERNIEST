@@ -4,7 +4,7 @@ from service.conversation import update_conversation_time, create_conversation, 
 
 def chat_view(st_object):
     st_object.title("ERNIEST")
-    st_object.markdown("百度ERNIE+Streamlit的大模型交流平台，作者：AFAN（afan-life），查看源码和二次开发请访问项目地址：https://github.com/AFAN-LIFE/ERNIEST")
+    st_object.markdown("百度ERNIE+Streamlit的可供快速二次开发的大模型交流平台，作者：AFAN（afan-life），查看源码和二次开发请访问项目地址：https://github.com/AFAN-LIFE/ERNIEST")
 
     def response_generator(messages: list):
         # from llm.erniebot import get_ernie_response

@@ -41,7 +41,6 @@ def sidebar_view(st_object):
         st_object.session_state.token = ''
     t1, t2 = st_object.sidebar.columns([2, 1])
     token_text = t1.text_input("", placeholder="请输入token", type="password", value=default_token)
-    print('token更换', token_text)
     if token_text:
         st_object.session_state.token = token_text
     if 'generator_modal' not in st_object.session_state:

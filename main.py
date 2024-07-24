@@ -2,7 +2,11 @@ import streamlit as st
 from database.initialize import initialize_database
 
 # 初始化sqlite数据库
-initialize_database()
+if 'initialize_database' not in st.session_state:
+    st.session_state.initialize_database = False
+if not st.session_state.initialize_database:
+    initialize_database()
+    st.session_state.initialize_database = True
 
 # 登录模块
 login_area = st.empty()
