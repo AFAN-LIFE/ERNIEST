@@ -3,6 +3,7 @@ import os
 from config import default_robot_name
 from log import log_function_call
 from function.register import functions
+from service.token import save_token_input, save_token_output
 
 
 @log_function_call
@@ -37,21 +38,30 @@ def get_qianfan_response(messages, st_object):
             new_messages.append({'role': 'function', 'name': function_call['name'],
                                  'content': json.dumps(func_result, ensure_ascii=False)})
             # 将结果返回进行润色
-            final_response = qianfan.ChatCompletion().do(model=st_object.session_state.model, messages=new_messages,
-                                                         top_p=0.2, functions=functions, stream=False)
+            final_response = qianfan.ChatCompletion().do(model='ernie-3.5-8k', messages=new_messages,
+                                                         functions=functions, stream=False)
             final_result = final_response['body']['result']
+            # 存储统计输入token数量，function call其实触发了两次请求，这里只取最后第二次
+            save_token_input(st_object, 'ernie-3.5-8k', new_messages)
             return final_result
         else:
+            save_token_input(st_object,'ernie-3.5-8k',  messages)
             result = response['body']['result']
+            # 存储统计输出token数量
+            save_token_output(st_object, 'ernie-3.5-8k', result)
             return result
     # 简单的模型调用免费，但不支持function call
     elif st_object.session_state.model == 'ernie-speed-128k':
         response = qianfan.ChatCompletion().do(
-            model=st_object.session_state.model,
+            model='ernie-speed-128k',
             messages=messages,
             stream=False
         )
+        # 存储统计输入token数量
+        save_token_input(st_object, 'ernie-speed-128k', messages)
         result = response['body']['result']
+        # 存储统计输出token数量
+        save_token_output(st_object, 'ernie-speed-128k', result)
         return result
     else:
         raise Exception('当前仅支持ernie-4.0和ernie-speed两种模型')

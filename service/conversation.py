@@ -19,7 +19,6 @@ def get_conversation_dict(user_name) -> dict:
     past_30_days_sessions = []
     earlier_sessions = []
     # 将会话按时间分类，以最后的对话时间来算
-    print(conversations)
     for conv in conversations:
         start_time = datetime.datetime.strptime(conv["end_time"], '%Y-%m-%d %H:%M:%S.%f')
         delta_days = (today - start_time).days

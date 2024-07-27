@@ -59,7 +59,7 @@ def sidebar_view(st_object):
             Secret_KEY = st_object.text_input(label="请输入Secret KEY", placeholder="")
             g1, g2, g3 = st_object.columns([1, 1, 1])
             generate_button = g1.button("生成token", key='start_generate', type='primary')
-            generate_detail = g2.link_button("帮助文档", 'https://cloud.baidu.com/article/1089328')
+            g2.link_button("帮助文档", 'https://cloud.baidu.com/article/1089328')
             if API_KEY != "" and Secret_KEY != "" and generate_button:
                 token_status, token_data = generate_token(API_KEY, Secret_KEY)
                 if token_status == "success":

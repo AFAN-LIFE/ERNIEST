@@ -2,7 +2,7 @@ from database.connection import gpt_connection
 
 def initialize_database():
     print('初始化数据库')
-    tables_to_check = ['conversations', 'messages']
+    tables_to_check = ['conversations', 'messages', 'token_stats', 'feedback']
     # 创建游标对象
     cursor = gpt_connection.cursor()
     # 存储已存在的表名
@@ -25,7 +25,6 @@ def initialize_database():
                         is_deleted BOOLEAN DEFAULT 0
                     );
                 """)
-                print(f"Table {table} created.")
             elif table.lower() == 'messages':
                 cursor.execute("""
                     CREATE TABLE messages (
@@ -34,13 +33,36 @@ def initialize_database():
                         sender TEXT NOT NULL,
                         message TEXT NOT NULL,
                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        is_deleted BOOLEAN DEFAULT 0,
-                        FOREIGN KEY (conversation_id) REFERENCES Conversations(id)
+                        is_deleted BOOLEAN DEFAULT 0
                     );
                 """)
-                print(f"Table {table} created.")
+            elif table.lower() == 'token_stats':
+                cursor.execute("""
+                    CREATE TABLE token_stats (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_name TEXT NOT NULL,
+                        conversation_id INTEGER,
+                        model_name TEXT NOT NULL,
+                        length INT,
+                        token_type BOOLEAN, -- 0 输入 1 输出
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                """)
+            elif table.lower() == 'feedback':
+                cursor.execute("""
+                    CREATE TABLE feedback (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_name TEXT NOT NULL,
+                        conversation_id INTEGER,
+                        message_id INTEGER,
+                        feedback_type TEXT NOT NULL,
+                        feedback_content TEXT, -- 如果是反馈内容就填写到这里
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                """)
         else:
-            print(f"Table {table} already exists.")
+            pass
+        print(f"Table {table} already exists.")
     # 提交更改
     gpt_connection.commit()
     # 关闭连接
