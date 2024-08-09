@@ -4,11 +4,20 @@ from config import default_robot_name, default_user_name
 from service.conversation import update_conversation_time, create_conversation, create_message
 
 
+def fix_abnormal_chat(st_object):
+    if len(st_object.session_state.messages) != 0:  # 如果有历史会话
+        st_object.write(len(st_object.session_state.messages))
+        if len(st_object.session_state.messages) % 2 == 1:  # 且为奇数，则上次可能异常退出
+            padding_content = '上次会话异常结束，请继续交流'
+            st_object.session_state.messages.append({'role': default_robot_name, 'content': padding_content})
+            update_conversation_time(st_object.session_state.conversation_id)
+            create_message(st_object.session_state.conversation_id, default_robot_name, padding_content)
+
 def chat_view(st_object):
     st_object.title("ERNIEST")
     st_object.markdown("作者：AFAN（微信：afan-life），项目地址：https://github.com/AFAN-LIFE/ERNIEST")
 
-    if 'feedback_event' not in st_object.session_state:
+    if 'feedback_event' not in st_object.session_state:  # 增加反馈按钮
         st_object.session_state.feedback_event = ''
 
     def response_generator(user_name, messages: list):
@@ -53,7 +62,7 @@ def chat_view(st_object):
             st_object.markdown(prompt)
         # 在机器的对话框中进行前端展示
         with st_object.chat_message(default_robot_name):
-            default = '正在思考，请稍后...'
+            default = '正在思考，请勿切换...'
             st_object.write_stream(stream=iter(default))
             try:
                 response_content = response_generator(st_object.session_state.user_name,

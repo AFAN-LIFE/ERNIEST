@@ -13,7 +13,7 @@ Online experience：https://erniest.streamlit.app/
 
 本项目目前包含如下功能：
 This project currently includes the following features:
-
+  
 - 1 用户登录，支持根据不同用户名登录显示不同的历史对话记录，可供二次开发增加更多鉴权方式  
 - 1 User login, supporting different historical conversation records based on different usernames, allowing for further development to add more authentication methods
 - 2 百度千帆大模型接入，内置免费token，支持在界面中进行百度千帆大模型的token获取，以及模型版本切换  

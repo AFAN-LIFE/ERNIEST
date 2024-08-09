@@ -37,7 +37,7 @@ def sidebar_view(st_object):
     """
     st_object.sidebar.markdown(html_string, unsafe_allow_html=True)
     st_object.sidebar.title(f"你好{st_object.session_state.user_name}")
-    if 'token' not in st_object.session_state:
+    if 'token' not in st_object.session_state:  # 增加token统计
         st_object.session_state.token = ''
     t1, t2 = st_object.sidebar.columns([2, 1])
     token_text = t1.text_input("", placeholder="请输入token", type="password", value=default_token)
@@ -86,6 +86,7 @@ def sidebar_view(st_object):
         st_object.session_state.messages = []
 
     def show_history_conversations(user_name, generator):
+        from view.chat import fix_abnormal_chat
         conversation_history: dict = get_conversation_dict(user_name)
         # 显示多个 sidebar，并确保只能选择一个
         for k, v in conversation_history.items():
@@ -94,15 +95,14 @@ def sidebar_view(st_object):
                 select_zip = zip([str(i['id']) for i in v], [str(i['theme']) for i in v])
                 for id, theme in select_zip:
                     # 用会话的第一条消息作为主题概括，只展示前15个字符，不然会跨行
-                    if generator.button(theme[:15], use_container_width=True, key=id):
+                    if generator.button(theme[:15], use_container_width=True, key=id):  # 防止请求返回过程中被打断
                         st_object.session_state.conversation_id = id
                         messages = get_message_via_cid(st_object.session_state.conversation_id)
                         adj_messages = [
                             {'role': default_robot_name if i['sender'] == default_robot_name else default_user_name,
                              'content': i['message']} for i in messages]
-                        # 更新当前的消息列表
-                        st_object.session_state.messages = adj_messages
-                        print('更新消息', st_object.session_state.messages)
+                        st_object.session_state.messages = adj_messages  # 更新当前的消息列表
+                        fix_abnormal_chat(st_object)  # 修复异常会话
 
     col1, col2 = st_object.sidebar.columns([2, 1])
     col1.markdown("### 历史会话记录")
