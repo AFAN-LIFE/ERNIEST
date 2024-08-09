@@ -82,6 +82,11 @@ Install all dependencies with one command:
 pip install -r requirements.txt
 ```
 
+如果需要安装向量数据库faiss，可以执行
+```
+conda install faiss-cpu==1.8.0 -c pytorch
+```
+
 在erniest的conda环境下执行：  
 Run the following command in the erniest conda environment:
 
